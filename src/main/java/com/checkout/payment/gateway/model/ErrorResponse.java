@@ -1,20 +1,10 @@
 package com.checkout.payment.gateway.model;
 
-public class ErrorResponse {
-  private final String message;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import java.time.OffsetDateTime;
 
-  public ErrorResponse(String message) {
-    this.message = message;
-  }
+public record ErrorResponse(@JsonProperty("error") String error,
+                            @JsonProperty("message") String message,
+                            @JsonProperty("timestamp") OffsetDateTime timestamp) {
 
-  public String getMessage() {
-    return message;
-  }
-
-  @Override
-  public String toString() {
-    return "ErrorResponse{" +
-        "message='" + message + '\'' +
-        '}';
-  }
 }
