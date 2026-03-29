@@ -2,6 +2,7 @@ package com.checkout.payment.gateway.service;
 
 import com.checkout.payment.gateway.dto.PaymentRequestDTO;
 import com.checkout.payment.gateway.dto.PaymentResponseDTO;
+import com.checkout.payment.gateway.exception.BankProcessingException;
 import com.checkout.payment.gateway.exception.PaymentNotFoundException;
 import com.checkout.payment.gateway.model.Payment;
 import com.checkout.payment.gateway.model.BankResponse;
@@ -21,8 +22,8 @@ public class PaymentGatewayService {
   private final PaymentsRepository paymentsRepository;
   private final BankService bankService;
 
-  public PaymentGatewayService( @Autowired PaymentsRepository paymentsRepository,
-      @Autowired BankService bankService) {
+  public PaymentGatewayService(PaymentsRepository paymentsRepository,
+      BankService bankService) {
     this.paymentsRepository = paymentsRepository;
     this.bankService = bankService;
   }
@@ -31,13 +32,21 @@ public class PaymentGatewayService {
     LOG.debug("Requesting access to to payment with ID {}", id);
      return paymentsRepository.get(id)
         .map(Payment::toPaymentResponseDTO)
-        .orElseThrow(() -> new PaymentNotFoundException("could not find payments",id));
+        .orElseThrow(() -> new PaymentNotFoundException("could not find payment",id));
   }
 
-  public PaymentResponseDTO processPayment(PaymentRequestDTO requestDTO) {
+  public PaymentResponseDTO processPayment(PaymentRequestDTO requestDTO,UUID paymentId) {
     LOG.debug("Requesting access to to payment with ID ");
-    Payment payment = Payment.fromPaymentRequest(PaymentRequest.fromDTO(requestDTO));
-    BankResponse bankResponse = bankService.processPayment(requestDTO);
+    Payment payment = new Payment(PaymentRequest.fromDTO(requestDTO),paymentId);
+    BankResponse bankResponse = null;
+    try{
+       bankResponse = bankService.processPayment(requestDTO);
+    } catch (BankProcessingException ex){
+      payment.markAsRejected("Bank processing failed: " + ex.getMessage());
+      paymentsRepository.add(payment);
+      throw  ex;
+    }
+
     payment.updateWithBankResponse(bankResponse);
     paymentsRepository.add(payment);
 

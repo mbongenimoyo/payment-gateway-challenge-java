@@ -12,7 +12,6 @@ public record PaymentResponseDTO(@JsonProperty("id") UUID id,
                                  @JsonProperty("currency") String currency,
                                  @JsonProperty("amount") Long amount) {
 
-
   @JsonProperty("expiry_date")
   public String getExpiryDate() {
     return String.format("%d/%d", expiryMonth, expiryYear);

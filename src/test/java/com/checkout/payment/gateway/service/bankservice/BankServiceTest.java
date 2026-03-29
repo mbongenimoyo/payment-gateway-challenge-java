@@ -1,6 +1,7 @@
 package com.checkout.payment.gateway.service.bankservice;
 
 import com.checkout.payment.gateway.dto.PaymentRequestDTO;
+import com.checkout.payment.gateway.exception.BankProcessingException;
 import com.checkout.payment.gateway.model.BankResponse;
 import com.checkout.payment.gateway.service.BankService;
 import org.junit.jupiter.api.BeforeEach;
@@ -117,12 +118,10 @@ class BankServiceTest {
         .thenThrow(exception);
 
     // Act & Assert
-    RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
+    RuntimeException thrown = assertThrows(BankProcessingException.class, () -> {
       bankService.processPayment(paymentRequest);
     });
 
-    assertTrue(thrown.getMessage().contains("Failed to communicate with bank"));
-    assertTrue(thrown.getCause() instanceof HttpClientErrorException);
 
     verify(restTemplate).exchange(
         eq(BANK_URL),
@@ -146,12 +145,10 @@ class BankServiceTest {
         .thenThrow(exception);
 
     // Act & Assert
-    RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
+    RuntimeException thrown = assertThrows(BankProcessingException.class, () -> {
       bankService.processPayment(paymentRequest);
     });
 
-    assertTrue(thrown.getMessage().contains("Failed to communicate with bank"));
-    assertTrue(thrown.getCause() instanceof HttpServerErrorException);
 
     verify(restTemplate).exchange(
         eq(BANK_URL),

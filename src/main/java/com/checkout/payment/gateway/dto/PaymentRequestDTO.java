@@ -11,9 +11,4 @@ public record PaymentRequestDTO(@JsonProperty("card_number") @NotBlank @NotNull 
                                 @JsonProperty("amount") @NotNull Long amount,
                                 @JsonProperty("cvv") @NotBlank @NotNull String cvv)  {
 
-
-  @JsonProperty("expiry_date")
-  public String getExpiryDate() {
-    return String.format("%d/%d", expiryMonth, expiryYear);
-  }
 }

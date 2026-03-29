@@ -31,7 +31,10 @@ class PaymentGatewayControllerTest {
         .andExpect(jsonPath("$.message").value("could not find payment"));
   }
 
-  //when valid payment request is made then return valid response
-
+  //when valid payment request with even card number is made then return valid response with decline
+  //when valid payment request with oden card number is made then return valid response with authorised
+  //when valid payment request end with 0  card number is made then return valid response with decline
+  //when valid payment request with missing card number  is made then return valid response with decline
   //when Payment request with missing cardnumber
+
 }

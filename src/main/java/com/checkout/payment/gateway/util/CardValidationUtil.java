@@ -26,8 +26,13 @@ public class CardValidationUtil {
 
 
   public static boolean isValidExpiryDate(int expiryMonth, int expiryYear) {
-    YearMonth current = YearMonth.now();
-    YearMonth expiry = YearMonth.of(expiryYear, expiryMonth);
-    return expiry.isAfter(current);
+    try{
+      YearMonth current = YearMonth.now();
+      YearMonth expiry = YearMonth.of(expiryYear, expiryMonth);
+      return expiry.isAfter(current);
+    } catch (Exception e) {
+      return false;
+    }
+
 }
 }

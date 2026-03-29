@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class PaymentsRepository {
 
+
   private final HashMap<UUID, Payment> payments = new HashMap<>();
 
   public void add(Payment payment) {
@@ -18,5 +19,4 @@ public class PaymentsRepository {
   public Optional<Payment> get(UUID id) {
     return Optional.ofNullable(payments.get(id));
   }
-
 }

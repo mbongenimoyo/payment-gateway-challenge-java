@@ -9,6 +9,7 @@ import org.springframework.boot.json.JsonParseException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.time.LocalDateTime;
@@ -26,6 +27,7 @@ public class GlobalExceptionHandler {
     ErrorResponse error = new ErrorResponse(
         ex.getErrors().toString(),
         ex.getMessage(),
+        PaymentStatus.REJECTED,
         OffsetDateTime.now()
     );
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
@@ -33,10 +35,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(BankProcessingException.class)
   public ResponseEntity<ErrorResponse> handleBankError(BankProcessingException ex) {
-    LOG.error("handleBankError:: there was issue on the bank side");
+    LOG.error("handleBankError:: There was issue on the bank side :{}",ex.getMessage());
     ErrorResponse error = new ErrorResponse(
         "Payment processing failed",
         "Unable to process payment at this time",
+        PaymentStatus.REJECTED,
         OffsetDateTime.now()
     );
     return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
@@ -48,6 +51,7 @@ public class GlobalExceptionHandler {
     ErrorResponse error = new ErrorResponse(
         "Payment not found",
         ex.getMessage(),
+        PaymentStatus.REJECTED,
         OffsetDateTime.now()
     );
     return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
@@ -55,10 +59,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleGeneric(Exception ex) {
-    LOG.error("handleGeneric:: Unhandled error was thrown");
+    LOG.error("handleGeneric:: Unhandled error was thrown: {}",ex.getMessage());
     ErrorResponse error = new ErrorResponse(
         "Internal server error",
         "An unexpected error occurred",
+        PaymentStatus.REJECTED,
         OffsetDateTime.now()
     );
     return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -66,12 +71,27 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleJsonParse(HttpMessageNotReadableException ex) {
-    LOG.error("handleGeneric:: Unhandled error was thrown");
+    LOG.warn("handleJsonParse:: Unhandled error was thrown");
     ErrorResponse error = new ErrorResponse(
         "Invalid request format",
         "The request body contains invalid JSON or malformed data",
+        PaymentStatus.REJECTED,
         OffsetDateTime.now()
     );
     return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
   }
+
+  @ExceptionHandler( MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException( MethodArgumentNotValidException ex) {
+    LOG.warn("handleMethodArgumentNotValidException:: handling invalid payment request");
+    ErrorResponse error = new ErrorResponse(
+        " MethodArgumentNotValidException",
+        ex.getMessage(),
+        PaymentStatus.REJECTED,
+        OffsetDateTime.now()
+    );
+    return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+  }
+
+
 }
