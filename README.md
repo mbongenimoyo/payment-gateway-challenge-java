@@ -27,6 +27,8 @@ For documentation openAPI is included, and it can be found under the following u
 
 ## My Implementation
 
+When I was building this solution, my goal was to make it as close to production-ready as possible within the scope of the challenge. I focused not only on functional correctness, but also on operational concerns such as observability, quality gates, and safe handling of sensitive payment data.
+
 This project is a Spring Boot payment gateway built to satisfy the Checkout.com "Building a payment gateway" challenge.
 
 ### Core Assumptions
