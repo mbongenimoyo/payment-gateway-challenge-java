@@ -1,11 +1,14 @@
-package com.checkout.payment.gateway.model;
+package com.checkout.payment.gateway.model.entity;
 
-import com.checkout.payment.gateway.dto.PaymentResponseDTO;
+import com.checkout.payment.gateway.model.bank.BankResponse;
+import com.checkout.payment.gateway.model.domain.PaymentRequest;
+import com.checkout.payment.gateway.model.api.PaymentResponse;
 import com.checkout.payment.gateway.enums.PaymentStatus;
 import java.util.UUID;
 
 
 public class Payment {
+
 
   private final UUID id;
   private final PaymentRequest paymentRequest;
@@ -20,8 +23,8 @@ public class Payment {
   }
 
 
-  public PaymentResponseDTO toPaymentResponseDTO() {
-    return new PaymentResponseDTO(
+  public PaymentResponse toPaymentResponseDTO() {
+    return new PaymentResponse(
         this.id,
         this.status,
         this.paymentRequest.cardNumberLastFour(),

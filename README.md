@@ -29,6 +29,17 @@ For documentation openAPI is included, and it can be found under the following u
 
 This project is a Spring Boot payment gateway built to satisfy the Checkout.com "Building a payment gateway" challenge.
 
+### Core Assumptions
+
+While implementing this challenge, I made the following core assumptions to keep the solution as production-ready as possible:
+
+- **Observability and monitoring are first-class concerns.**
+  I implemented structured logging with meaningful log levels and added API monitoring. Monitoring data is routed through Kafka/ELK and visualized in Grafana.
+- **Comprehensive test coverage should be enforced in CI/build.**
+  JaCoCo is configured and coverage verification is enforced through the Gradle build lifecycle (`check` depends on `jacocoTestCoverageVerification`).
+- **Sensitive card data must not be retained.**
+  The full PAN and CVV are not persisted in stored payment records. Only the last four digits of the card are stored and returned.
+
 ### Architecture (high level)
 
 The payment flow is implemented across:
@@ -93,9 +104,15 @@ If validation fails, the gateway returns `400 Bad Request` with an `ErrorRespons
 `ApiMonitoringAspect` records controller method calls and sends sanitized events to Kafka topic `api-monitoring`.
 Sensitive payment fields (card number + CVV) are excluded.
 
+Monitoring stack in `docker-compose.yml` includes:
+
+- Kafka + Kafka Connect for event transport
+- Logstash + Elasticsearch for processing/storage
+- Grafana for dashboards/visualization
+
 ### Running Locally
 
 The recommended way to run is:
 `docker compose up`
 
-This starts the bank simulator, Kafka, and the API container.]
+This starts the bank simulator, payment gateway, and supporting observability services (Kafka, Kafka Connect, Logstash, Elasticsearch, Grafana).

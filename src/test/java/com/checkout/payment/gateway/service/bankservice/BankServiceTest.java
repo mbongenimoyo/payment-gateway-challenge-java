@@ -1,9 +1,9 @@
 package com.checkout.payment.gateway.service.bankservice;
 
-import com.checkout.payment.gateway.dto.PaymentRequestDTO;
+import com.checkout.payment.gateway.model.api.CreatePaymentRequest;
 import com.checkout.payment.gateway.exception.BankProcessingException;
-import com.checkout.payment.gateway.model.BankResponse;
-import com.checkout.payment.gateway.service.BankService;
+import com.checkout.payment.gateway.model.bank.BankResponse;
+import com.checkout.payment.gateway.service.BankClient;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,20 +31,20 @@ class BankServiceTest {
   private RestTemplate restTemplate;
 
   @InjectMocks
-  private BankService bankService;
+  private BankClient bankClient;
 
   private static final String BANK_URL = "http://localhost:8080/payments";
-  private PaymentRequestDTO paymentRequest;
+  private CreatePaymentRequest paymentRequest;
   private BankResponse authorizedResponse;
   private BankResponse declinedResponse;
 
   @BeforeEach
   void setUp() {
     // Set the bank URL using reflection since it's @Value injected
-    ReflectionTestUtils.setField(bankService, "bankUrl", BANK_URL);
+    ReflectionTestUtils.setField(bankClient, "bankUrl", BANK_URL);
 
     // Create test payment request
-    paymentRequest = new PaymentRequestDTO(
+    paymentRequest = new CreatePaymentRequest(
         "2222405343248877",  // card number (last four)
         4,                    // expiry month
         2025,                 // expiry year
@@ -66,7 +66,7 @@ class BankServiceTest {
         .thenReturn(responseEntity);
 
     // Act
-    BankResponse result = bankService.processPayment(paymentRequest);
+    BankResponse result = bankClient.processPayment(paymentRequest);
 
     // Assert
     assertNotNull(result);
@@ -89,7 +89,7 @@ class BankServiceTest {
         .thenReturn(responseEntity);
 
     // Act
-    BankResponse result = bankService.processPayment(paymentRequest);
+    BankResponse result = bankClient.processPayment(paymentRequest);
 
     // Assert
     assertNotNull(result);
@@ -119,7 +119,7 @@ class BankServiceTest {
 
     // Act & Assert
     RuntimeException thrown = assertThrows(BankProcessingException.class, () -> {
-      bankService.processPayment(paymentRequest);
+      bankClient.processPayment(paymentRequest);
     });
 
 
@@ -146,7 +146,7 @@ class BankServiceTest {
 
     // Act & Assert
     RuntimeException thrown = assertThrows(BankProcessingException.class, () -> {
-      bankService.processPayment(paymentRequest);
+      bankClient.processPayment(paymentRequest);
     });
 
 
@@ -167,7 +167,7 @@ class BankServiceTest {
 
     // Act & Assert
     RuntimeException thrown = assertThrows(RuntimeException.class, () -> {
-      bankService.processPayment(paymentRequest);
+      bankClient.processPayment(paymentRequest);
     });
 
 
@@ -187,7 +187,7 @@ class BankServiceTest {
         .thenReturn(responseEntity);
 
     // Act
-    BankResponse result = bankService.processPayment(paymentRequest);
+    BankResponse result = bankClient.processPayment(paymentRequest);
 
     // Assert
     assertNull(result);
@@ -203,7 +203,7 @@ class BankServiceTest {
   @Test
   void processPayment_WithDifferentPaymentRequests_ShouldSendCorrectData() {
     // Arrange
-    PaymentRequestDTO differentRequest = new PaymentRequestDTO(
+    CreatePaymentRequest differentRequest = new CreatePaymentRequest(
         "1111222233334444",  // different card
         12,                   // different month
         2026,                 // different year
@@ -217,7 +217,7 @@ class BankServiceTest {
         .thenReturn(responseEntity);
 
     // Act
-    BankResponse result = bankService.processPayment(differentRequest);
+    BankResponse result = bankClient.processPayment(differentRequest);
 
     // Assert
     assertNotNull(result);
@@ -240,7 +240,7 @@ class BankServiceTest {
         .thenReturn(responseEntity);
 
     // Act
-    bankService.processPayment(paymentRequest);
+    bankClient.processPayment(paymentRequest);
 
     // Assert
     verify(restTemplate).exchange(

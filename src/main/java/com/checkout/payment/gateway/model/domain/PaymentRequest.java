@@ -1,13 +1,11 @@
-package com.checkout.payment.gateway.model;
+package com.checkout.payment.gateway.model.domain;
 
-import com.checkout.payment.gateway.dto.PaymentRequestDTO;
+import com.checkout.payment.gateway.model.api.CreatePaymentRequest;
 import com.checkout.payment.gateway.exception.InvalidPaymentException;
 import com.checkout.payment.gateway.util.CardValidationUtil;
 import com.checkout.payment.gateway.util.CurrencyUtil;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -21,7 +19,7 @@ public record PaymentRequest(String cardNumberLastFour, int expiryMonth, int exp
     cardNumberLastFour =  cardNumberLastFour.substring(cardNumberLastFour.length()-4);
   }
 
-  public static PaymentRequest fromDTO(PaymentRequestDTO dto) {
+  public static PaymentRequest fromDTO(CreatePaymentRequest dto) {
 
     return new PaymentRequest(
         dto.cardNumber(),

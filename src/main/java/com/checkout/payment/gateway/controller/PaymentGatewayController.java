@@ -1,13 +1,12 @@
 package com.checkout.payment.gateway.controller;
 
-import com.checkout.payment.gateway.dto.PaymentRequestDTO;
-import com.checkout.payment.gateway.dto.PaymentResponseDTO;
+import com.checkout.payment.gateway.model.api.CreatePaymentRequest;
+import com.checkout.payment.gateway.model.api.PaymentResponse;
 import com.checkout.payment.gateway.service.PaymentGatewayService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +29,14 @@ public class PaymentGatewayController {
 
 
   @GetMapping("/payment/{id}")
-  public ResponseEntity<PaymentResponseDTO> getPostPaymentEventById(@PathVariable UUID id) {
+  public ResponseEntity<PaymentResponse> getPostPaymentEventById(@PathVariable UUID id) {
     LOG.info("Starting payment processing for paymentId: {}",id);
 
     return new ResponseEntity<>(paymentGatewayService.getPaymentById(id), HttpStatus.OK);
   }
 
   @PostMapping("/payment")
-  public ResponseEntity<PaymentResponseDTO> processPayment(@Valid @RequestBody PaymentRequestDTO paymentRequest) {
+  public ResponseEntity<PaymentResponse> processPayment(@Valid @RequestBody CreatePaymentRequest paymentRequest) {
    //TODO: instead of random UUID key could be derived from payload variables, this allows ID to act as Idempotency key
     UUID paymentId = UUID.randomUUID();
     LOG.info("Starting payment processing for paymentId: {}, amount: {} {}",
