@@ -2,6 +2,7 @@ package com.checkout.payment.gateway.service;
 
 import com.checkout.payment.gateway.model.api.CreatePaymentRequest;
 import com.checkout.payment.gateway.exception.BankProcessingException;
+import com.checkout.payment.gateway.model.bank.BankRequest;
 import com.checkout.payment.gateway.model.bank.BankResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +34,12 @@ public class BankClient {
   //
   public BankResponse processPayment(CreatePaymentRequest request)  {
     LOG.debug("processPayment:: started bank call for payment request: {}", request.toString());
+    BankRequest bankRequest = new BankRequest(request);
     try {
       HttpHeaders headers = new HttpHeaders();
       headers.set("Content-Type", "application/json");
 
-      HttpEntity<CreatePaymentRequest> entity = new HttpEntity<>(request, headers);
+      HttpEntity<BankRequest> entity = new HttpEntity<>(bankRequest, headers);
 
       // Make POST request to bank simulator
       ResponseEntity<BankResponse> response = restTemplate.exchange(
